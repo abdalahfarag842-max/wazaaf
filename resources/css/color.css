@@ -1,0 +1,78 @@
+:root {
+
+    /* ── Primary Palette ──────────────────────────────────── */
+
+    --color-primary:        #1D4ED8;   /* الأزرار الرئيسية، الروابط، focus border، sidebar active، أيقونات الكروت، أرقام الجداول */
+    --color-dark:           #1E3A8A;   /* الـ Sidebar، الـ Footer، عناوين H1، chart bars ثانوية، hover على الأزرار */
+    --color-light:          #DBEAFE;   /* خلفية الأيقونات، بادج New، skill tags، funnel bars، calendar hover، الـ avatars */
+    --color-white:          #FFFFFF;   /* خلفية الـ cards، الـ topnav، الـ modals، نص فوق Primary و Dark */
+    --color-bg:             #F8FAFC;   /* خلفية الصفحة، table header، search inputs، حقول النوتس */
+
+    /* ── Text Colors ──────────────────────────────────────── */
+
+    --color-text:           #0F172A;   /* أسماء المتقدمين، عناوين الكروت، بيانات الجداول، قيم الـ metrics */
+    --color-text-secondary: #475569;   /* عناوين أعمدة الجدول، labels الـ metrics، معلومات ثانوية */
+    --color-text-muted:     #94A3B8;   /* placeholder، bar labels، تواريخ الجداول، أيام calendar السابقة */
+
+    /* ── Borders ──────────────────────────────────────────── */
+
+    --color-border:         #E2E8F0;   /* حدود الـ cards، فواصل الجداول، حدود الـ inputs الافتراضية */
+    --color-border-focus:   #1D4ED8;   /* حدود الـ input عند focus، tab indicator، left border كروت الإنترفيو */
+
+    /* ── Status: Success ──────────────────────────────────── */
+
+    --color-success:        #2E7D32;   /* اللون الأساسي للنجاح */
+    --color-success-base:   #16A34A;   /* نص بادج Hired، progress fill الأخضر */
+    --color-success-light:  #DCFCE7;   /* خلفية بادج Hired، avatar أخضر */
+
+    /* ── Status: Danger ───────────────────────────────────── */
+
+    --color-danger:         #C62828;   /* اللون الأساسي للخطر */
+    --color-danger-base:    #DC2626;   /* نص بادج Rejected، رسائل الخطأ، حدود is-error */
+    --color-danger-light:   #FEE2E2;   /* خلفية بادج Rejected، خلفية is-error input */
+
+    /* ── Status: Warning ──────────────────────────────────── */
+
+    --color-warning-base:   #854D0E;   /* نص بادج Paused، تحذيرات deadline */
+    --color-warning-light:  #FEF9C3;   /* خلفية بادج Paused */
+
+    /* ── Status: Info / Interview ─────────────────────────── */
+
+    --color-info-base:      #0369A1;   /* نص بادج Interview */
+    --color-info-light:     #E0F2FE;   /* خلفية بادج Interview */
+
+    /* ── Status: Reviewing ────────────────────────────────── */
+
+    --color-review-base:    #1E3A8A;   /* نص بادج Reviewing */
+    --color-review-light:   #EEF2FF;   /* خلفية بادج Reviewing، avatar dark */
+
+    /* ── Status: Closed / Disabled ───────────────────────── */
+
+    --color-neutral-base:   #64748B;   /* نص بادج Closed، أزرار disabled */
+    --color-neutral-light:  #F1F5F9;   /* خلفية بادج Closed، عناصر غير نشطة */
+
+    /* ── Sidebar Specific ─────────────────────────────────── */
+
+    --sidebar-bg:               #1E3A8A;
+    --sidebar-text:             rgba(255, 255, 255, 0.65);
+    --sidebar-text-active:      #FFFFFF;
+    --sidebar-text-section:     rgba(255, 255, 255, 0.35);
+    --sidebar-item-active-bg:   #1D4ED8;
+    --sidebar-item-hover-bg:    rgba(255, 255, 255, 0.08);
+    --sidebar-divider:          rgba(255, 255, 255, 0.10);
+
+    /* ── Ready-made Combos ────────────────────────────────── */
+    /*
+        CTA Button       → bg: --color-primary     | text: --color-white
+        Skill Tag        → bg: --color-light        | text: --color-primary
+        Sidebar/Header   → bg: --color-dark         | text: --color-white
+        Table / Input    → bg: --color-bg           | text: --color-text
+        Badge New        → bg: --color-light        | text: --color-primary
+        Badge Reviewing  → bg: --color-review-light | text: --color-review-base
+        Badge Interview  → bg: --color-info-light   | text: --color-info-base
+        Badge Hired      → bg: --color-success-light| text: --color-success-base
+        Badge Rejected   → bg: --color-danger-light | text: --color-danger-base
+        Badge Paused     → bg: --color-warning-light| text: --color-warning-base
+        Badge Closed     → bg: --color-neutral-light| text: --color-neutral-base
+    */
+}
