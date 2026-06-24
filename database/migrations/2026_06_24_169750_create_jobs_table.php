@@ -14,10 +14,6 @@ return new class extends Migration
     Schema::create('job_lists', function (Blueprint $table) {
         $table->id();
 
-        $table->foreignId('company_id')
-            ->constrained()
-            ->cascadeOnDelete();
-
         $table->foreignId('category_id')
             ->constrained()
             ->cascadeOnDelete();

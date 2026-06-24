@@ -25,11 +25,6 @@ class User extends Authenticatable
         ];
     }
 
-    public function company()
-    {
-        return $this->hasOne(Company::class);
-    }
-
     public function candidate()
     {
         return $this->hasOne(Candidate::class);
