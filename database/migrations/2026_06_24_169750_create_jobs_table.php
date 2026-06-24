@@ -19,7 +19,7 @@ return new class extends Migration
             ->cascadeOnDelete();
 
         $table->string('title')
-            ->nllable();
+            ->nullable();
 
         $table->text('description')
             ->nullable();

@@ -13,7 +13,7 @@
 
   
 
-    @include('layouts.footer')
+    @include('partials.footer')
 
 </body>
 </html>
