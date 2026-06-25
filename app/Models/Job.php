@@ -2,18 +2,26 @@
 
 namespace App\Models;
 
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Job extends Model
 {
-    /** @use HasFactory<\Database\Factories\JobFactory> */
     use HasFactory;
 
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
-    }
+    protected $table = 'job_lists';
+
+    protected $fillable = [
+        'category_id',
+        'title',
+        'description',
+        'salary',
+        'location',
+        'job_type',
+        'status',
+        'deadline',
+    ];
 
     public function category()
     {
@@ -22,6 +30,6 @@ class Job extends Model
 
     public function applications()
     {
-        return $this->hasMany(Application::class);
+        return $this->hasMany(Application::class, 'job_list_id');
     }
 }

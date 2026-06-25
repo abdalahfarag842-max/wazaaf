@@ -2,16 +2,34 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Job;
 use Illuminate\Database\Seeder;
 
 class JobSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        //
+        for ($i = 1; $i <= 40; $i++) {
+
+            Job::create([
+                'category_id' => rand(1,8),
+                'title' => "Job $i",
+                'description' => "Description for Job $i",
+                'salary' => rand(7000,25000),
+                'location' => 'Cairo',
+                'job_type' => collect([
+                    'full_time',
+                    'part_time',
+                    'remote',
+                    'internship'
+                ])->random(),
+                'status' => collect([
+                    'open',
+                    'closed'
+                ])->random(),
+                'deadline' => now()->addDays(rand(10,60)),
+            ]);
+
+        }
     }
 }

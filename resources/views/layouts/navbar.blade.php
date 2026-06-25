@@ -1,6 +1,6 @@
 @auth
     @if(auth()->user()->role === 'admin')
-        @include('partials.navbar_admin')
+        @include('partials.sidebar_admin')
 
     @elseif(auth()->user()->role === 'employee')
         @include('partials.navbar_employee')
@@ -12,6 +12,6 @@
 @endauth
 
 @guest
-    <a href="{{ route('login') }}">Login</a>
+    <a href="{{ route('login') }}">Login</a>ِ
     <a href="{{ route('register') }}">Register</a>
 @endguest

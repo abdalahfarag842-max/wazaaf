@@ -3,17 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Wazaaf')</title>
+    <title>Wazaaf</title>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+   @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/sidebar.js'])
 </head>
 <body>
-
     @include('layouts.navbar')
-
-  
-
-    @include('partials.footer')
-
+    <div class="page-wrapper" id="pageWrapper">
+        {{ $slot }}
+    </div>
 </body>
 </html>
