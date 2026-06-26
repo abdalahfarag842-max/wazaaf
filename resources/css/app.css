@@ -1,7 +1,9 @@
 @import './color.css';
 @import './admin/sidebar.css';
 @import './admin/dashboard.css';
-
+@import './register.css';
+@import './login.css';
+@import './forget-password.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
