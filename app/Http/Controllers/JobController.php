@@ -3,63 +3,100 @@
 namespace App\Http\Controllers;
 
 use App\Models\Job;
+use App\Models\User;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Notifications\NewJobNotification;
 
 class JobController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $query = Job::with('category')
+            ->where('status', 'open');
+
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('location', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        if ($request->filled('job_type')) {
+            $query->where('job_type', $request->job_type);
+        }
+
+        $jobs = $query->latest()->paginate(10);
+        $categories = Category::all();
+
+        return view('home', compact('jobs', 'categories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(Job $job)
     {
-        //
+        $job->load('category');
+        return view('jobs.show', compact('job'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    public function create()
+    {
+        $categories = Category::all();
+        return view('jobs.create', compact('categories'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'title'       => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'salary'      => 'nullable|numeric',
+            'location'    => 'required|string|max:255',
+            'job_type'    => 'required|in:full_time,part_time,remote,internship',
+            'deadline'    => 'nullable|date',
+        ]);
+
+        $job = Job::create($validated);
+
+        // إرسال notification لكل اليوزرز غير اللي عمل الـ job
+        User::where('id', '!=', auth()->id())
+            ->get()
+            ->each(fn($user) => $user->notify(new NewJobNotification($job)));
+
+        return redirect()->route('jobs.index')->with('success', 'Job posted successfully.');
+    }
+
     public function edit(Job $job)
     {
-        //
+        $categories = Category::all();
+        return view('jobs.edit', compact('job', 'categories'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Job $job)
     {
-        //
+        $validated = $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'title'       => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'salary'      => 'nullable|numeric',
+            'location'    => 'required|string|max:255',
+            'job_type'    => 'required|in:full_time,part_time,remote,internship',
+            'status'      => 'required|in:open,closed',
+            'deadline'    => 'nullable|date',
+        ]);
+
+        $job->update($validated);
+
+        return redirect()->route('jobs.index')->with('success', 'Job updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Job $job)
     {
-        //
+        $job->delete();
+        return redirect()->route('jobs.index')->with('success', 'Job deleted successfully.');
     }
 }
