@@ -1,4 +1,4 @@
-<nav>
+ <nav>
     <a href="{{ route('home') }}">Home</a>
 
     <a href="{{ route('jobs.index') }}">
@@ -17,4 +17,7 @@
         @csrf
         <button type="submit">Logout</button>
     </form>
-</nav>
+</nav> 
+
+
+ 
