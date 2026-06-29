@@ -13,7 +13,7 @@ class DashboardController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+  public function index()
 {
     return view('admin.dashboard', [
         'jobsCount' => Job::count(),
@@ -21,12 +21,20 @@ class DashboardController extends Controller
         'applicationsCount' => Application::count(),
         'categoriesCount' => Category::count(),
 
-        'latestJobs' => Job::latest()->take(5)->get(),
+        // Applications Statistics
+        'pendingApplications' => Application::where('status', 'pending')->count(),
+        'reviewApplications' => Application::where('status', 'review')->count(),
+        'acceptedApplications' => Application::where('status', 'accepted')->count(),
+        'rejectedApplications' => Application::where('status', 'rejected')->count(),
 
+        // Latest Jobs
+        'latestJobs' => Job::latest()->take(10)->get(),
+
+        // Latest Applications
         'latestApplications' => Application::with([
             'job',
             'candidate.user'
-        ])->latest()->take(5)->get(),
+        ])->latest()->take(10)->get(),
     ]);
 }
 

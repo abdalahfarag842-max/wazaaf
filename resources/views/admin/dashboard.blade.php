@@ -2,10 +2,11 @@
 
     <div class="dashboard">
 
+        <!-- Header -->
         <section class="dashboard-header">
 
             <div>
-                <h1>Dashboard</h1>
+                <h1 class="dash">Dashboard</h1>
                 <p>Welcome back, {{ auth()->user()->name }}.</p>
             </div>
 
@@ -15,6 +16,7 @@
 
         </section>
 
+        <!-- Main Statistics -->
         <section class="stats-grid">
 
             <article class="stat-card">
@@ -42,10 +44,36 @@
             </article>
 
         </section>
+
+        <!-- Applications Summary -->
+        <section class="application-summary">
+
+            <div class="summary-card pending-card">
+                <h4>Pending Applications</h4>
+                <h2>{{ $pendingApplications }}</h2>
+            </div>
+
+            <div class="summary-card review-card">
+                <h4>In Review</h4>
+                <h2>{{ $reviewApplications }}</h2>
+            </div>
+
+            <div class="summary-card accepted-card">
+                <h4>Accepted</h4>
+                <h2>{{ $acceptedApplications }}</h2>
+            </div>
+
+            <div class="summary-card rejected-card">
+                <h4>Rejected</h4>
+                <h2>{{ $rejectedApplications }}</h2>
+            </div>
+
+        </section>
+
+        <!-- Tables -->
         <section class="dashboard-content">
 
             <!-- Latest Jobs -->
-
             <div class="dashboard-box">
 
                 <div class="box-header">
@@ -66,7 +94,6 @@
                     <tbody>
 
                         @foreach($latestJobs as $job)
-
                             <tr>
 
                                 <td>{{ $job->title }}</td>
@@ -80,7 +107,6 @@
                                 </td>
 
                             </tr>
-
                         @endforeach
 
                     </tbody>
@@ -90,7 +116,6 @@
             </div>
 
             <!-- Latest Applications -->
-
             <div class="dashboard-box">
 
                 <div class="box-header">
@@ -101,13 +126,11 @@
                 <table>
 
                     <thead>
-
                         <tr>
                             <th>Candidate</th>
                             <th>Job</th>
                             <th>Status</th>
                         </tr>
-
                     </thead>
 
                     <tbody>
@@ -116,20 +139,14 @@
 
                             <tr>
 
-                                <td>
-                                    {{ $application->candidate->user->name }}
-                                </td>
+                                <td>{{ $application->candidate->user->name }}</td>
+
+                                <td>{{ $application->job->title }}</td>
 
                                 <td>
-                                    {{ $application->job->title }}
-                                </td>
-
-                                <td>
-
                                     <span class="status {{ $application->status }}">
                                         {{ ucfirst($application->status) }}
                                     </span>
-
                                 </td>
 
                             </tr>

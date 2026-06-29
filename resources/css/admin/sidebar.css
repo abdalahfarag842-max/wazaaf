@@ -2,12 +2,12 @@
 
 /* Burger Button */
 
-/* الـ burger يبقى visible دايماً */
 .menu-toggle {
     display: flex;
     position: fixed;
-    top: 25px;
-    left: 93%;
+    top: 1rem;      
+    right: 1rem;     
+    left: unset;     
     z-index: 9999;
     width: 45px;
     height: 45px;
@@ -196,10 +196,12 @@
 /* ── Page Content ──────────────────────────────────── */
 
 .page-wrapper {
-    margin-left: 260px;
+    margin-left: 280px;
+    margin-right: 10px;
+    margin-top: 10px;
     transition: margin-left 0.3s ease;
 }
 
 .page-wrapper.expanded {
-    margin-left: 0;
+    margin: 10px 20px;
 }

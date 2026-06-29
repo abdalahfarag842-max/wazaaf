@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Job;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -12,7 +13,17 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        $totalCategory = Category::count();
+        $totalJob = Job::count();
+        $mostActive = Category::withCount('jobs')
+        -> orderByDesc('jobs_count')
+        -> first();
+
+        return view('admin.categories.index', compact(
+            'mostActive',
+            'totalCategory',
+            'totalJob'
+        ));
     }
 
     /**

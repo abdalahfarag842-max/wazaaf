@@ -1,6 +1,8 @@
 @import './color.css';
 @import './admin/sidebar.css';
 @import './admin/dashboard.css';
+@import './admin/jobs.css';
+@import './admin/category/index.css';
 
 @tailwind base;
 @tailwind components;

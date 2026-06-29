@@ -8,23 +8,20 @@ use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\CategoryController;
 
+// Candidate only
+Route::get('/home', function () {
+    return view('user.home');
+})->middleware('auth')->name('home');
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Admin & HR only
+Route::middleware(['auth', 'verified', 'admin'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
-
-Route::middleware(['auth'])->group(function () {
     Route::resource('jobs', JobController::class);
     Route::resource('candidates', CandidateController::class);
     Route::resource('applications', ApplicationController::class);
     Route::resource('categories', CategoryController::class);
-});
 
-Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
