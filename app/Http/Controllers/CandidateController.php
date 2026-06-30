@@ -15,16 +15,37 @@ class CandidateController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
+    public function index(Request $request)
+{
+    $candidates = Candidate::with('user')
 
-        $candidates = Candidate::with('user')
-            ->withCount('applications')
-            ->latest()
-            ->paginate(10);
+        ->when($request->search, function ($query) use ($request) {
 
-        return view('candidates.index', compact('candidates'));
+            $query->where('phone', 'like', "%{$request->search}%")
+
+                ->orWhereHas('user', function ($user) use ($request) {
+
+                    $user->where('name', 'like', "%{$request->search}%")
+                         ->orWhere('email', 'like', "%{$request->search}%");
+
+                });
+
+        })
+
+        ->latest()
+
+        ->paginate(10)
+
+        ->withQueryString();
+
+    if ($request->ajax()) {
+
+        return view('candidates.table', compact('candidates'));
+
     }
+
+    return view('candidates.index', compact('candidates'));
+}
 
     /**
      * Show the form for creating a new resource.
