@@ -11,22 +11,31 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $categories = Category::withCount('jobs')->paginate(10);
+public function index(Request $request)
+{
+    $categories = Category::withCount('jobs')
+        ->when($request->filled('search'), function ($query) use ($request) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        })
+        ->latest()
+        ->paginate(10)
+        ->withQueryString();
 
-        $categories->getCollection()->transform(function ($category) {
+    $categories->getCollection()->transform(function ($category) {
+        $category->companies_count = $category->jobs()
+            ->whereNotNull('company_id')
+            ->distinct('company_id')
+            ->count('company_id');
 
-            $category->companies_count = $category->jobs()
-                ->whereNotNull('company_id')
-                ->distinct('company_id')
-                ->count('company_id');
+        return $category;
+    });
 
-            return $category;
-        });
-
-        return view('categories.index', compact('categories'));
+    if ($request->ajax()) {
+        return view('categories.table', compact('categories'));
     }
+
+    return view('categories.index', compact('categories'));
+}
 
     /**
      * Show the form for creating a new resource.
