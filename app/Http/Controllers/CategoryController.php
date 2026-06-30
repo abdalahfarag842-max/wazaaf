@@ -10,14 +10,30 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $categories = Category::withCount('jobs')
-            ->latest()
-            ->paginate(10);
+    public function index(Request $request)
+{
+    $categories = Category::withCount('jobs')
 
-        return view('categories.index', compact('categories'));
+        ->when($request->filled('search'), function ($query) use ($request) {
+
+            $query->where('name', 'like', '%' . $request->search . '%');
+
+        })
+
+        ->latest()
+
+        ->paginate(10)
+
+        ->withQueryString();
+
+    if ($request->ajax()) {
+
+        return view('categories.table', compact('categories'));
+
     }
+
+    return view('categories.index', compact('categories'));
+}
 
     /**
      * Show the form for creating a new resource.
