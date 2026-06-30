@@ -1,4 +1,4 @@
- <?php
+<?php
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
@@ -9,28 +9,34 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationController;
 
-Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
-Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.readAll');
-
 Route::get('/', function () {
     return redirect()->route('register');
 })->name('welcome');
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+    // Jobs
+    Route::resource('jobs', JobController::class);
 
+    // Applications – custom create + resource
+    Route::get('/applications', [ApplicationController::class, 'index'])->name('applications.index');
+    Route::get('/applications/create', [ApplicationController::class, 'create'])->name('applications.create');
+    Route::post('/applications', [ApplicationController::class, 'store'])->name('applications.store');
+
+    // Candidates & Categories
+    Route::resource('candidates', CandidateController::class);
+    Route::resource('categories', CategoryController::class);
+
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.readAll');
+});
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
-    Route::resource('jobs', JobController::class);
-    Route::resource('candidates', CandidateController::class);
-    Route::resource('applications', ApplicationController::class);
-    Route::resource('categories', CategoryController::class);
-});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -38,4 +44,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php'; 
+require __DIR__ . '/auth.php';

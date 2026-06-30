@@ -4,28 +4,26 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Admin
-        User::create([
-            'name' => 'Admin',
-            'email' => 'admin@gmail.com',
-            'password' => Hash::make('12345678'),
-            'role' => 'admin',
-        ]);
+        // 1. نبحث عن المستخدم باستخدام البريد الإلكتروني
+        $user = User::where('email', 'admin@gmail.com')->first();
 
-        // Candidates
-        for ($i = 1; $i <= 30; $i++) {
+        // 2. إذا لم يكن المستخدم موجوداً، نقوم بإنشائه
+        if (!$user) {
             User::create([
-                'name' => "Candidate $i",
-                'email' => "candidate$i@gmail.com",
-                'password' => Hash::make('12345678'),
-                'role' => 'user',
+                'name' => 'Admin',
+                'email' => 'admin@gmail.com',
+                'password' => '12345678', // سيتم تشفيرها تلقائياً بفضل الـ cast في الموديل
+                'role' => 'admin',
             ]);
+            $this->command->info('Admin user created successfully.');
+        } else {
+            // 3. إذا كان موجوداً، نخبرك بذلك بدلاً من إظهار خطأ
+            $this->command->warn('Admin user already exists. Skipping...');
         }
     }
 }

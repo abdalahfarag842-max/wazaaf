@@ -5,6 +5,7 @@
 @import './login.css';
 @import './forget-password.css';
 /* @import './home.css'; */
+/* @import './pages/job-board.css'; */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

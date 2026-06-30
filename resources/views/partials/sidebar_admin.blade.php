@@ -16,6 +16,8 @@
             <span class="nav-text">Dashboard</span>
         </a>
 
+
+       {{-- الصفحه دى بتاعت اليوزر  --}}
         <a class="nav-item {{ request()->routeIs('jobs.*') ? 'active' : '' }}" href="{{ route('jobs.index') }}">
             <i class="ti ti-briefcase" aria-hidden="true"></i>
             <span class="nav-text">Jobs</span>

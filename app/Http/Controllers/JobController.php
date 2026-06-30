@@ -10,31 +10,29 @@ use App\Notifications\NewJobNotification;
 
 class JobController extends Controller
 {
-    public function index(Request $request)
-    {
-        $query = Job::with('category')
-            ->where('status', 'open');
+  public function index(Request $request)
+{
+    $query = Job::with('category');
 
-        if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('location', 'like', '%' . $request->search . '%');
-            });
-        }
-
-        if ($request->filled('category')) {
-            $query->where('category_id', $request->category);
-        }
-
-        if ($request->filled('job_type')) {
-            $query->where('job_type', $request->job_type);
-        }
-
-        $jobs = $query->latest()->paginate(10);
-        $categories = Category::all();
-
-        return view('home', compact('jobs', 'categories'));
+    // Single keyword search: matches title OR location OR description, case-insensitive
+   
+    if ($request->filled('category')) {
+        $query->where('category_id', $request->category);
     }
+
+    if ($request->filled('job_type')) {
+        $query->where('job_type', $request->job_type);
+    }
+
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    $jobs = $query->latest()->paginate(12);
+    $categories = Category::all();
+
+    return view('jobs.index', compact('jobs', 'categories'));
+}
 
     public function show(Job $job)
     {
@@ -62,7 +60,6 @@ class JobController extends Controller
 
         $job = Job::create($validated);
 
-        // إرسال notification لكل اليوزرز غير اللي عمل الـ job
         User::where('id', '!=', auth()->id())
             ->get()
             ->each(fn($user) => $user->notify(new NewJobNotification($job)));

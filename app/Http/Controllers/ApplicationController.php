@@ -3,63 +3,90 @@
 namespace App\Http\Controllers;
 
 use App\Models\Application;
+use App\Models\Candidate;
+use App\Models\Job;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ApplicationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $candidate = Auth::user()->candidate;
+
+        if (!$candidate) {
+            $applications = collect();
+        } else {
+            $applications = Application::with(['job.category'])
+                ->where('candidate_id', $candidate->id)
+                ->latest()
+                ->get();
+        }
+
+        return view('applications.index', compact('applications'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(Request $request)
     {
-        //
-    }
+        $job = Job::with('category')->findOrFail($request->job_id);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        if ($job->status === 'closed') {
+            return redirect()->route('jobs.show', $job)->with('error', 'This job is closed.');
+        }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Application $application)
-    {
-        //
+        return view('applications.create', compact('job'));
     }
+public function store(Request $request)
+{
+    $request->validate([
+            'job_id'           => 'required|exists:job_lists,id',
+            'name'             => 'required|string|max:255',
+            'phone'            => 'required|string|max:20',
+            'address'          => 'required|string|max:255',
+            'experience_years' => 'required|integer|min:0|max:50',
+            'cv'               => 'required|file|mimes:pdf,doc,docx|max:5120',
+            'cover_letter'     => 'nullable|string|max:2000',
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Application $application)
-    {
-        //
-    }
+        $job = Job::findOrFail($request->job_id);
+        $user = Auth::user();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Application $application)
-    {
-        //
-    }
+        // Store or update candidate profile
+        $cvPath = null;
+        if ($request->hasFile('cv')) {
+            $cvPath = $request->file('cv')->store('cvs', 'public');
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Application $application)
-    {
-        //
+        $candidate = Candidate::updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'phone'            => $request->phone,
+                'address'          => $request->address,
+                'experience_years' => $request->experience_years,
+                'bio'              => $request->cover_letter,
+                'cv'               => $cvPath ?? (optional($user->candidate)->cv),
+            ]
+        );
+
+        // Check not already applied
+        $alreadyApplied = Application::where('job_list_id', $job->id)
+            ->where('candidate_id', $candidate->id)
+            ->exists();
+
+        if ($alreadyApplied) {
+            return redirect()->route('applications.index')
+                ->with('success', 'You have already applied for this job.');
+        }
+
+        Application::create([
+            'job_list_id'  => $job->id,
+            'candidate_id' => $candidate->id,
+            'cover_letter' => $request->cover_letter,
+            'status'       => 'pending',
+        ]);
+
+        return redirect()->route('applications.index')
+            ->with('success', 'Your application has been submitted successfully! ');
     }
 }
