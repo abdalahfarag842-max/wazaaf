@@ -13,17 +13,19 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $totalCategory = Category::count();
-        $totalJob = Job::count();
-        $mostActive = Category::withCount('jobs')
-        -> orderByDesc('jobs_count')
-        -> first();
+        $categories = Category::withCount('jobs')->paginate(10);
 
-        return view('admin.categories.index', compact(
-            'mostActive',
-            'totalCategory',
-            'totalJob'
-        ));
+        $categories->getCollection()->transform(function ($category) {
+
+            $category->companies_count = $category->jobs()
+                ->whereNotNull('company_id')
+                ->distinct('company_id')
+                ->count('company_id');
+
+            return $category;
+        });
+
+        return view('categories.index', compact('categories'));
     }
 
     /**
@@ -31,15 +33,23 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+        return view('categories.create');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource.
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name',
+        ]);
+
+        Category::create($validated);
+
+        return redirect()
+            ->route('categories.index')
+            ->with('success', 'Category created successfully.');
     }
 
     /**
@@ -47,7 +57,13 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        //
+        $category->load([
+            'jobs' => function ($query) {
+                $query->latest();
+            }
+        ])->loadCount('jobs');
+
+        return view('categories.show', compact('category'));
     }
 
     /**
@@ -55,22 +71,43 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        //
+        return view('categories.edit', compact('category'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource.
      */
     public function update(Request $request, Category $category)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
+        ]);
+
+        $category->update($validated);
+
+        return redirect()
+            ->route('categories.index')
+            ->with('success', 'Category updated successfully.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource.
      */
     public function destroy(Category $category)
     {
-        //
+        if ($category->jobs()->exists()) {
+
+            return back()->with(
+                'error',
+                'This category contains jobs and cannot be deleted.'
+            );
+
+        }
+
+        $category->delete();
+
+        return redirect()
+            ->route('categories.index')
+            ->with('success', 'Category deleted successfully.');
     }
 }

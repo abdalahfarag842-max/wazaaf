@@ -5,14 +5,39 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use Illuminate\Http\Request;
 
+
 class CompanyController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+
+    public function index(Request $request)
     {
-        //
+        $query = Company::query();
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $companies = $query
+            ->withCount([
+                'jobs',
+                'jobs as open_jobs_count' => function ($q) {
+                    $q->where('status', 'open');
+                },
+                'jobs as closed_jobs_count' => function ($q) {
+                    $q->where('status', 'closed');
+                },
+                'jobs as draft_jobs_count' => function ($q) {
+                    $q->where('status', 'draft');
+                },
+            ])
+            ->orderByDesc('open_jobs_count')
+            ->paginate(9)
+            ->withQueryString();
+
+        return view('companies.index', compact('companies'));
     }
 
     /**
@@ -20,7 +45,7 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        //
+        return view('companies.create');
     }
 
     /**
@@ -28,9 +53,20 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:companies,email',
+            'website' => 'nullable|url|max:255',
+            'location' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
 
+        Company::create($validated);
+
+        return redirect()
+            ->route('companies.index')
+            ->with('success', 'Company created successfully.');
+    }
     /**
      * Display the specified resource.
      */

@@ -12,16 +12,17 @@ class Job extends Model
 
     protected $table = 'job_lists';
 
-    protected $fillable = [
-        'category_id',
-        'title',
-        'description',
-        'salary',
-        'location',
-        'job_type',
-        'status',
-        'deadline',
-    ];
+   protected $fillable = [
+    'company_id',
+    'category_id',
+    'title',
+    'description',
+    'salary',
+    'location ',
+    'job_type',
+    'status',
+    'deadline',
+];
 
     public function category()
     {
@@ -31,5 +32,9 @@ class Job extends Model
     public function applications()
     {
         return $this->hasMany(Application::class, 'job_list_id');
+    }
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
     }
 }

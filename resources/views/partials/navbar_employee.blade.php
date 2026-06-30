@@ -1,5 +1,5 @@
 <nav>
-    <a href="{{ route('home') }}">Home</a>
+    <a href="{{ route('dashboard') }}">Home</a>
 
     <a href="{{ route('employee.dashboard') }}">
         Dashboard

@@ -9,8 +9,6 @@
     </div>
 
     <nav class="sidebar-nav">
-        <span class="nav-label">Main</span>
-
         <a class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
             <i class="ti ti-layout-dashboard" aria-hidden="true"></i>
             <span class="nav-text">Dashboard</span>
@@ -33,12 +31,17 @@
             <span class="nav-text">Applications</span>
         </a>
 
-        <span class="nav-label">Manage</span>
 
         <a class="nav-item {{ request()->routeIs('categories.*') ? 'active' : '' }}"
             href="{{ route('categories.index') }}">
             <i class="ti ti-tag" aria-hidden="true"></i>
             <span class="nav-text">Categories</span>
+        </a>
+
+        <a class="nav-item {{ request()->routeIs('companies.*') ? 'active' : '' }}"
+            href="{{ route('companies.index') }}">
+            <i class="ti ti-building" aria-hidden="true"></i>
+            <span class="nav-text">Companies</span>
         </a>
     </nav>
 
