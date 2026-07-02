@@ -4,13 +4,25 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        if (!auth()->check() || !in_array(auth()->user()->role, ['admin', 'hr'])) {
-            abort(403);
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $userRole = auth()->user()->role;
+
+        if (!in_array($userRole, $roles)) {
+            return match ($userRole) {
+                'admin'     => redirect()->route('dashboard'),
+                'employee'  => redirect()->route('hr.jobs.index'),
+                'candidate' => redirect()->route('candidate.home'),
+                default     => redirect()->route('login'),
+            };
         }
 
         return $next($request);

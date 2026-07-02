@@ -32,7 +32,7 @@ class AuthenticatedSessionController extends Controller
         if (in_array($user->role, ['admin', 'hr'])) {
             return redirect()->route('dashboard');
         }
-        return redirect()->route('home');
+        return redirect()->route('candidate.home');
     }
 
     /**

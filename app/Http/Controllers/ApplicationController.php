@@ -3,123 +3,86 @@
 namespace App\Http\Controllers;
 
 use App\Models\Application;
+use App\Models\Candidate;
+use App\Models\Job;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ApplicationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-public function index(Request $request)
-{
-    $applications = Application::with([
-        'candidate.user',
-        'job.category',
-    ])
-
-    ->when($request->filled('search'), function ($query) use ($request) {
-
-        $search = $request->search;
-
-        $query->where('status', 'like', "%{$search}%")
-
-            ->orWhereHas('candidate.user', function ($q) use ($search) {
-
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-
-            })
-
-            ->orWhereHas('job', function ($q) use ($search) {
-
-                $q->where('title', 'like', "%{$search}%");
-
-            });
-
-    })
-
-    ->latest()
-
-    ->paginate(10)
-
-    ->withQueryString();
-
-    if ($request->ajax()) {
-
-    return view('applications.table', compact('applications'));
-
-}
-
-return view('applications.index', compact('applications'));
-}
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function index()
     {
-        abort(404);
+        $candidate = Auth::user()->candidate;
+
+        $applications = $candidate
+            ? Application::with(['job.category'])
+                ->where('candidate_id', $candidate->id)
+                ->latest()
+                ->get()
+            : collect();
+
+        return view('application.index', compact('applications'));
     }
 
-    /**
-     * Store a newly created resource.
-     */
+    public function create(Request $request)
+    {
+        $job = Job::with('category')->findOrFail($request->job_id);
+
+        if ($job->status === 'closed') {
+            return redirect()->route('candidate.jobs.show', $job)->with('error', 'This job is closed.');
+        }
+
+        return view('application.create', compact('job'));
+    }
+
     public function store(Request $request)
     {
-        abort(404);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Application $application)
-    {
-        $application->load([
-            'candidate.user',
-            'job.category',
+        $request->validate([
+            'job_id'           => 'required|exists:job_lists,id',
+            'name'             => 'required|string|max:255',
+            'phone'            => 'required|string|max:20',
+            'address'          => 'required|string|max:255',
+            'experience_years' => 'required|integer|min:0|max:50',
+            'cv'               => 'required|file|mimes:pdf,doc,docx|max:5120',
+            'cover_letter'     => 'nullable|string|max:2000',
         ]);
 
-        return view('applications.show', compact('application'));
-    }
+        $job  = Job::findOrFail($request->job_id);
+        $user = Auth::user();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Application $application)
-    {
-        $application->load([
-            'candidate.user',
-            'job.category',
+        $cvPath = null;
+        if ($request->hasFile('cv')) {
+            $cvPath = $request->file('cv')->store('cvs', 'public');
+        }
+
+        $candidate = Candidate::updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'phone'            => $request->phone,
+                'address'          => $request->address,
+                'experience_years' => $request->experience_years,
+                'bio'              => $request->cover_letter,
+                'cv'               => $cvPath ?? optional($user->candidate)->cv,
+            ]
+        );
+
+        $alreadyApplied = Application::where('job_list_id', $job->id)
+            ->where('candidate_id', $candidate->id)
+            ->exists();
+
+        if ($alreadyApplied) {
+            return redirect()->route('candidate.applications.index')
+                ->with('success', 'You have already applied for this job.');
+        }
+
+        Application::create([
+            'job_list_id'  => $job->id,
+            'candidate_id' => $candidate->id,
+            'cover_letter' => $request->cover_letter,
+            'status'       => 'pending',
         ]);
 
-        return view('applications.edit', compact('application'));
-    }
-
-    /**
-     * Update the specified resource.
-     */
-    public function update(Request $request, Application $application)
-    {
-        $validated = $request->validate([
-            'status' => 'required|in:pending,reviewed,accepted,rejected',
-        ]);
-
-        $application->update($validated);
-
-        return redirect()
-            ->route('applications.index')
-            ->with('success', 'Application updated successfully.');
-    }
-
-    /**
-     * Remove the specified resource.
-     */
-    public function destroy(Application $application)
-    {
-        $application->delete();
-
-        return redirect()
-            ->route('applications.index')
-            ->with('success', 'Application deleted successfully.');
+        return redirect()->route('candidate.applications.index')
+            ->with('success', 'Your application has been submitted successfully!');
     }
 }

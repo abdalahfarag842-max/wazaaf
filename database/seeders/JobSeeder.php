@@ -16,7 +16,7 @@ class JobSeeder extends Seeder
 
             Job::create([
                 'company_id' => fake()->randomElement($companyIds),
-
+                'created_by' => 1,
                 'category_id' => rand(1, 8),
                 'title' => "Job $i",
                 'description' => "Description for Job $i",

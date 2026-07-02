@@ -29,11 +29,13 @@
     transition:.25s;
     display:flex;
     flex-direction:column;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
+
 .company-card:hover{
-    transform:translateY(-5px);
-    box-shadow:0 12px 24px rgba(37,99,235,.12);
+    transform: scale(1.015);
+    box-shadow: 0 12px 30px rgba(59, 130, 246, 0.25);
 }
 
 .company-avatar{
@@ -155,27 +157,35 @@
 }
 
 .company-actions .btn-view{
-    background:#2563eb;
+    background:#dbeafe;
+    color:#2563eb;
 }
 
 .company-actions .btn-view:hover{
-    background:#1d4ed8;
+    background:#bfdbfe;
+    transform:translateY(-2px);
 }
 
 .company-actions .btn-edit{
-    background:#f59e0b;
+     background:#fef3c7;
+    color:#b45309;
 }
 
 .company-actions .btn-edit:hover{
-    background:#d97706;
+     background:#fde68a;
+    transform:translateY(-2px);
+    
 }
 
 .company-actions .btn-delete{
-    background:#ef4444;
+    background:#fee2e2;
+    color:#dc2626;
 }
 
 .company-actions .btn-delete:hover{
-    background:#dc2626;
+    background:#fecaca;
+    transform:translateY(-2px);
+
 }
 
 .empty-state{
@@ -222,3 +232,93 @@
 
 }
 /* form-input styles moved to jobs.css to avoid conflicts */
+.company-view-card{
+    background:#fff;
+    border-radius:18px;
+    padding:32px;
+    margin-top:25px;
+    box-shadow:0 0 10px rgb(0, 0, 0);
+    border:1px solid #e5e7eb;
+}
+
+.company-info{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:28px;
+}
+
+.info-group{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.info-label{
+    font-size:13px;
+    font-weight:600;
+    text-transform:uppercase;
+    color:#6b7280;
+    letter-spacing:.5px;
+}
+
+.info-group p{
+    margin:0;
+    font-size:16px;
+    color:#1f2937;
+    line-height:1.7;
+}
+
+.company-namee{
+    font-size:28px;
+    font-weight:600;
+    color:#2563eb  !important;
+}
+
+.full-width{
+    grid-column:1/-1;
+}
+
+.text-muted{
+    color:#9ca3af;
+}.action-buttons{
+    display:flex;
+    justify-content:flex-end;
+    gap:15px;
+    margin-top:30px;
+}
+
+.btn-edi_edit,
+.btn-back_show{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:12px 22px;
+    border-radius:10px;
+    text-decoration:none;
+    font-size:15px;
+    font-weight:600;
+    transition:all .25s ease;
+}
+
+/* Edit Button */
+.btn-edi_edit{
+    background:#fef3c7;
+    color:#b45309;
+}
+
+.btn-edi_edit:hover{
+    background:#fde68a;
+    transform:translateY(-2px);
+}
+
+/* Back Button */
+.btn-back_show{
+    background:#dbeafe;
+    color:#2563eb;
+}
+
+.btn-back_show:hover{
+    background:#bfdbfe;
+    transform:translateY(-2px);
+}

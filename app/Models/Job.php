@@ -12,18 +12,18 @@ class Job extends Model
 
     protected $table = 'job_lists';
 
-   protected $fillable = [
-    'company_id',
-    'category_id',
-    'title',
-    'description',
-    'salary',
-    'location ',
-    'job_type',
-    'status',
-    'deadline',
-];
-
+    protected $fillable = [
+        'company_id',
+        'category_id',
+        'title',
+        'description',
+        'salary',
+        'location',
+        'job_type',
+        'status',
+        'deadline',
+        'created_by',
+    ];
     public function category()
     {
         return $this->belongsTo(Category::class);

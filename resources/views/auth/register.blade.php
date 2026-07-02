@@ -1,52 +1,89 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
+    
+
+    <form method="POST" action="{{ route('register') }}" class="form">
         @csrf
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-        </div>
+        <p class="title">Register</p>
+        <p class="message">Signup now and get full access to our app.</p>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+        {{-- Name --}}
+        <label>
+            <input
+                required
+                placeholder=""
+                type="text"
+                name="name"
+                value="{{ old('name') }}"
+                class="input"
+                autofocus
+                autocomplete="name"
+            >
+            <span>Name</span>
+        </label>
+        @error('name')
+            <span class="error-msg">{{ $message }}</span>
+        @enderror
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+        {{-- Email --}}
+        <label>
+            <input
+                required
+                placeholder=""
+                type="email"
+                name="email"
+                value="{{ old('email') }}"
+                class="input"
+                autocomplete="username"
+            >
+            <span>Email</span>
+        </label>
+        @error('email')
+            <span class="error-msg">{{ $message }}</span>
+        @enderror
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
+        {{-- Password --}}
+        <label>
+            <input
+                required
+                placeholder=""
+                type="password"
+                name="password"
+                class="input"
+                autocomplete="new-password"
+            >
+            <span>Password</span>
+        </label>
+        @error('password')
+            <span class="error-msg">{{ $message }}</span>
+        @enderror
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+        {{-- Confirm Password --}}
+        <label>
+            <input
+                required
+                placeholder=""
+                type="password"
+                name="password_confirmation"
+                class="input"
+                autocomplete="new-password"
+            >
+            <span>Confirm password</span>
+        </label>
+        @error('password_confirmation')
+            <span class="error-msg">{{ $message }}</span>
+        @enderror
+          
+        </label>
+        @error('role')
+            <span class="error-msg">{{ $message }}</span>
+        @enderror
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+        <button type="submit" class="submit">Register</button>
 
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
+        <p class="signin">
+            Already have an account?
+            <a href="{{ route('login') }}">Signin</a>
+        </p>
     </form>
 </x-guest-layout>

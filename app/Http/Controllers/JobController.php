@@ -3,146 +3,95 @@
 namespace App\Http\Controllers;
 
 use App\Models\Job;
+use App\Models\User;
 use App\Models\Category;
-use App\Models\Company;
 use Illuminate\Http\Request;
+use App\Notifications\NewJobNotification;
 
 class JobController extends Controller
 {
-    /**
-     * Display a listing of jobs with filters.
-     */
     public function index(Request $request)
     {
-        $categories = Category::all();
-        $companies = Company::all();
-        $query = Job::with(['category', 'company']);
-        // Search by title or location
-        if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('title', 'like', '%' . $request->search . '%')
-                    ->orWhere('location', 'like', '%' . $request->search . '%');
-            });
+        $query = Job::with('category');
+
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
         }
 
-        // Filter by category
-        if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
-        
-        // Filter by company
-        if ($request->filled('company_id')) {
-            $query->where('company_id', $request->company_id);
+        if ($request->filled('job_type')) {
+            $query->where('job_type', $request->job_type);
         }
 
-        // Filter by status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Filter by location
-        if ($request->filled('location')) {
-            $query->where('location', 'like', '%' . $request->location . '%');
-        }
-
-        $jobs = $query->latest()->paginate(10)->withQueryString();
+        $jobs       = $query->latest()->paginate(12);
         $categories = Category::all();
 
-        // Stats for the top cards
-        $stats = [
-            'total' => Job::count(),
-            'open' => Job::where('status', 'open')->count(),
-            'closed' => Job::where('status', 'closed')->count(),
-            'draft' => Job::where('status', 'draft')->count(),
-        ];
-
-        return view('jobs.index', compact(
-            'jobs',
-            'categories',
-            'companies',
-            'stats'
-        ));
+        return view('job.index', compact('jobs', 'categories'));
     }
 
-    /**
-     * Show the form for creating a new job.
-     */
+    public function show(Job $job)
+    {
+        $job->load('category');
+        return view('job.show', compact('job'));
+    }
+
     public function create()
     {
         $categories = Category::all();
-        $companies = Company::all();
-
-        return view('jobs.create', compact('categories', 'companies'));
+        return view('job.create', compact('categories'));
     }
-    /**
-     * Store a newly created job.
-     */
+
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'location' => 'required|string|max:255',
-            'salary' => 'nullable|numeric|min:0',
-            'status' => 'required|in:open,closed,draft',
             'category_id' => 'required|exists:categories,id',
-            'company_id' => 'required|exists:companies,id',
+            'title'       => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'salary'      => 'nullable|numeric',
+            'location'    => 'required|string|max:255',
+            'job_type'    => 'required|in:full_time,part_time,remote,internship',
+            'deadline'    => 'nullable|date',
         ]);
 
-        Job::create($validated);
+        $job = Job::create($validated);
 
-        return redirect()->route('jobs.index')
-            ->with('success', 'Job created successfully.');
+        User::where('id', '!=', auth()->id())
+            ->get()
+            ->each(fn($user) => $user->notify(new NewJobNotification($job)));
+
+        return redirect()->route('candidate.jobs.index')->with('success', 'Job posted successfully.');
     }
 
-    /**
-     * Display the specified job.
-     */
-    public function show(Job $job)
-    {
-        $job->load('category', 'company', 'applications.candidate.user');
-        return view('jobs.show', compact('job'));
-    }
-
-    /**
-     * Show the form for editing the specified job.
-     */
     public function edit(Job $job)
     {
         $categories = Category::all();
-        $companies = Company::all();
-
-        return view('jobs.edit', compact('job', 'categories', 'companies'));
+        return view('job.edit', compact('job', 'categories'));
     }
-    /**
-     * Update the specified job.
-     */
+
     public function update(Request $request, Job $job)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'location' => 'required|string|max:255',
-            'salary' => 'nullable|numeric|min:0',
-            'status' => 'required|in:open,closed,draft',
             'category_id' => 'required|exists:categories,id',
-            'company_id' => 'required|exists:companies,id',
+            'title'       => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'salary'      => 'nullable|numeric',
+            'location'    => 'required|string|max:255',
+            'job_type'    => 'required|in:full_time,part_time,remote,internship',
+            'status'      => 'required|in:open,closed',
+            'deadline'    => 'nullable|date',
         ]);
 
         $job->update($validated);
 
-        return redirect()->route('jobs.index')
-            ->with('success', 'Job updated successfully.');
+        return redirect()->route('candidate.jobs.index')->with('success', 'Job updated successfully.');
     }
 
-    /**
-     * Remove the specified job.
-     */
     public function destroy(Job $job)
     {
         $job->delete();
-
-        return redirect()->route('jobs.index')
-            ->with('success', 'Job deleted successfully.');
+        return redirect()->route('candidate.jobs.index')->with('success', 'Job deleted successfully.');
     }
 }

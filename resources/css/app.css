@@ -3,6 +3,10 @@
 @import './admin/sidebar.css';
 @import './admin/dashboard.css';
 @import './admin/jobs.css';
+@import './register.css';
+@import './login.css';
+@import './forget-password.css';
+@import './home.css';
 
 @tailwind base;
 @tailwind components;
